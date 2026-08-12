@@ -1,0 +1,19 @@
+/*
+  Content security and related headers for Netlify
+*/
+/* Set strong CSP and other security headers */
+/* Note: adjust allowed origins if you add third-party resources */
+
+/* Content-Security-Policy */
+/* default-src 'self'; img-src 'self' data:; script-src 'self'; style-src 'self'; connect-src 'self'; font-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; */
+
+/* Apply headers to all routes */
+/* /  */
+/:
+  Content-Security-Policy: default-src 'self'; img-src 'self'; script-src 'self'; style-src 'self'; connect-src 'self'; font-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; report-to csp-endpoint; report-uri /csp-report;
+  Report-To: {"group":"csp-endpoint","max_age":10886400,"endpoints":[{"url":"https://<YOUR_DEPLOY_DOMAIN>/csp-report"}],"include_subdomains":true}
+  Strict-Transport-Security: max-age=63072000; includeSubDomains; preload
+  X-Content-Type-Options: nosniff
+  X-Frame-Options: DENY
+  Referrer-Policy: no-referrer
+  Permissions-Policy: geolocation=(), camera=(), microphone=(), interest-cohort=()

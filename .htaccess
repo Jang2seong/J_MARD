@@ -1,0 +1,12 @@
+# Apache .htaccess example to set security headers
+<IfModule mod_headers.c>
+  Header set Content-Security-Policy "default-src 'self'; img-src 'self'; script-src 'self'; style-src 'self'; connect-src 'self'; font-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; report-to csp-endpoint; report-uri /csp-report;"
+  Header set Report-To "{\"group\":\"csp-endpoint\",\"max_age\":10886400,\"endpoints\":[{\"url\":\"https://<YOUR_DEPLOY_DOMAIN>/csp-report\"}],\"include_subdomains\":true}"
+  Header set Strict-Transport-Security "max-age=63072000; includeSubDomains; preload"
+  Header set X-Content-Type-Options "nosniff"
+  Header set X-Frame-Options "DENY"
+  Header set Referrer-Policy "no-referrer"
+  Header set Permissions-Policy "geolocation=(), camera=(), microphone=(), interest-cohort=()"
+</IfModule>
+
+# Optional: accept CSP reports via mod_security or server-side script at /csp-report
