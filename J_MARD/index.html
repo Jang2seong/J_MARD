@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="referrer" content="no-referrer" />
+  <!-- CSP and other security headers are applied via server response headers. -->
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>J_MARD | Creative Director</title>
+
+  <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+  <div class="page">
+
+    <!-- 왼쪽 흰색 메인 영역 -->
+    <main class="main-area" id="home">
+
+      <div class="cloud-layer" aria-hidden="true">
+        <canvas id="cloudCanvas" class="cloud-canvas"></canvas>
+      </div>
+
+      <header class="top-header">
+        <a href="#" class="small-logo">J_MARD</a>
+
+        <nav class="top-nav">
+        </nav>
+      </header>
+
+      <section class="hero" id="heroSection">
+        <h1 id="heroTitle">J_MARD</h1>
+        <p id="heroSubtitle">Creative Director</p>
+      </section>
+
+      <div class="scroll">
+        <span>SCROLL</span>
+        <span class="scroll-arrow">↓</span>
+      </div>
+
+      <div class="hero-media" id="heroMedia" aria-hidden="true">
+        <div class="painting-container">
+          <div class="painting-left">
+            <div class="painting-image-wrap">
+              <img id="paintingImage" src="./images/cloud.png" alt="뭉게구름 회화 작품" class="painting-image">
+            </div>
+            <button type="button" id="paintingPrev" class="painting-nav painting-nav--left" aria-label="Previous artwork">‹</button>
+            <button type="button" id="paintingNext" class="painting-nav painting-nav--right" aria-label="Next artwork">›</button>
+            <p id="paintingCaption" class="painting-caption">뭉게구름 116.8x60.2 50P 캔버스에 아크릴</p>
+          </div>
+        </div>
+        <p class="hero-media-caption"></p>
+      </div>
+
+      <div id="about" class="section-anchor"></div>
+      <div id="projects" class="section-anchor"></div>
+      <div id="contact" class="section-anchor"></div>
+
+    </main>
+
+    <!-- 경계선 -->
+    <div class="divider-line"></div>
+
+    <!-- 오른쪽 검은색 사이드바 -->
+    <aside class="side-area">
+
+      <div class="side-logo-wrap">
+          <div class="side-logo">
+          <span>J_MARD</span>
+        </div>
+      </div>
+
+      <nav class="side-menu">
+
+        <a href="#home" class="menu-item" data-target="home">
+          <span class="menu-number">01</span>
+
+          <span>
+            <strong class="menu-title">HOME</strong>
+            <span class="menu-subtitle">홈</span>
+          </span>
+        </a>
+
+        <a href="#about" class="menu-item" data-target="about">
+          <span class="menu-number">02</span>
+
+          <span>
+            <strong class="menu-title">PROFILE</strong>
+            <span class="menu-subtitle">프로필</span>
+          </span>
+        </a>
+
+        <div class="menu-item archive-item" data-target="archive">
+          <span class="menu-number">03</span>
+
+          <div>
+            <a href="#archive" class="menu-link" data-target="archive">
+              <strong class="menu-title">ARCHIVE</strong>
+              <span class="menu-subtitle">작품 아카이브</span>
+            </a>
+
+            <div class="archive-submenu" aria-label="Archive categories">
+              <button type="button" class="archive-submenu-link" data-label="Painting" data-title="PAINTING" data-description="회화 작품들이 모여 있는 섹션입니다." data-target="painting">painting</button>
+              <button type="button" class="archive-submenu-link" data-label="Media Art" data-title="MEDIA ART" data-description="미디어 아트 작품들이 모여 있는 섹션입니다." data-target="media">media art</button>
+            </div>
+          </div>
+        </div>
+
+        <a href="#projects" class="menu-item" data-target="projects">
+          <span class="menu-number">04</span>
+
+          <span>
+            <strong class="menu-title">PROJECTS</strong>
+            <span class="menu-subtitle">프로젝트</span>
+          </span>
+        </a>
+
+        <a href="#contact" class="menu-item" data-target="contact">
+          <span class="menu-number">05</span>
+
+          <span>
+            <strong class="menu-title">CONTACT</strong>
+            <span class="menu-subtitle">연락하기</span>
+          </span>
+        </a>
+
+      </nav>
+
+      <footer class="side-footer">
+
+        <div class="social-links">
+          <a href="https://www.instagram.com/heumeul_heumeul/" target="_blank" rel="noopener noreferrer">INSTAGRAM</a>
+          <a href="https://www.behance.net/a52d21a0" target="_blank" rel="noopener noreferrer">BEHANCE</a>
+          <a href="mailto:ssyaaa3578@naver.com">EMAIL</a>
+        </div>
+
+        <p class="copyright">
+          © J_MARD. All rights reserved.
+        </p>
+
+      </footer>
+
+    </aside>
+
+  </div>
+
+  <div id="archiveOverlay" class="archive-overlay" aria-hidden="true">
+    <div class="archive-panel">
+      <h2 id="archiveTitle">ARCHIVE</h2>
+      <p id="archiveDescription">작품 아카이브 섹션입니다.</p>
+      <button type="button" class="archive-close" id="archiveClose">Close</button>
+    </div>
+  </div>
+
+  <script src="js/main.js" defer></script>
+</body>
+</html>
