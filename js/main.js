@@ -109,7 +109,7 @@ if (dividerLine) {
 
 function setHeroSection(target) {
   const sectionMap = {
-    home: { title: 'NOMARD', subtitle: 'Creative Director' },
+    home: { title: 'J_mard', subtitle: 'Creative Director' },
     painting: { title: 'PAINTING', subtitle: '회화' },
     media: { title: 'MEDIA ART', subtitle: '미디어 아트 아카이브' },
     about: { title: 'PROFILE', subtitle: 'Jang seong Lee 1999 08.04' },
