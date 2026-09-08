@@ -16,6 +16,21 @@ body {
   line-height: 1.4;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+}
+
+img, canvas, video, svg {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  -webkit-user-drag: none;
+  user-drag: none;
+  pointer-events: none;
 }
 
 /* 기본 페이지 레이아웃: 왼쪽 메인(약 85%), 오른쪽 사이드(약 15%) */
@@ -269,7 +284,12 @@ body {
   letter-spacing: clamp(12px, 1.2vw, 20px);
   white-space: nowrap;
   line-height: 1;
-  transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1), letter-spacing 0.35s ease;
+  transition: opacity 0.2s ease, transform 0.3s cubic-bezier(0.22, 1, 0.36, 1), letter-spacing 0.35s ease;
+}
+
+.hero h1.is-changing {
+  opacity: 0;
+  transform: translateY(8px);
 }
 
 .hero p {
@@ -644,6 +664,46 @@ body {
   color: #d4d4d4;
   line-height: 1.5;
   display: block;
+}
+
+.menu-project-detail {
+  display: block;
+  max-height: 0;
+  margin-top: 0;
+  overflow: hidden;
+  color: #d4d4d4;
+  font-size: 9px;
+  letter-spacing: 1.2px;
+  line-height: 1.7;
+  opacity: 0;
+  transform: translateY(-3px);
+  transition: max-height 0.25s ease, margin-top 0.25s ease, opacity 0.25s ease, transform 0.25s ease;
+}
+
+.menu-project-detail span {
+  display: block;
+}
+
+.project-detail-item {
+  cursor: pointer;
+  transition: color 0.2s ease, opacity 0.2s ease;
+}
+
+.project-detail-item:hover,
+.project-detail-item:focus-visible {
+  color: #fff;
+  opacity: 0.8;
+  outline: none;
+}
+
+.menu-item:hover .menu-project-detail,
+.menu-item.is-hovered .menu-project-detail,
+.menu-item:focus-visible .menu-project-detail,
+.menu-item:focus-within .menu-project-detail {
+  max-height: 40px;
+  margin-top: 8px;
+  opacity: 1;
+  transform: translateY(0);
 }
 
 .section-anchor {
