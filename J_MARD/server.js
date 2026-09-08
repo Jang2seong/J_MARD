@@ -35,7 +35,7 @@ app.use((req, res, next) => {
     res.setHeader('X-Content-Type-Options', 'nosniff');
     res.setHeader('X-Frame-Options', 'DENY');
     res.setHeader('Referrer-Policy', 'no-referrer');
-    res.setHeader('Permissions-Policy', 'geolocation=(), camera=(), microphone=(), interest-cohort=()');
+    res.setHeader('Permissions-Policy', 'geolocation=(), camera=(), microphone=(), display-capture=(), interest-cohort=()');
 
   // X-Powered-By 노출 제거
   res.removeHeader('X-Powered-By');
@@ -43,12 +43,17 @@ app.use((req, res, next) => {
 });
 
 // CSP report receiver for testing (logs reports to console)
-app.post('/csp-report', express.json({ type: ['application/csp-report', 'application/json'] }), (req, res) => {
+app.post('/csp-report', express.json({
+  limit: '8kb',
+  strict: true,
+  type: ['application/csp-report', 'application/json']
+}), (req, res) => {
   try {
     console.log('CSP Report:', JSON.stringify(req.body));
   } catch (e) {
     console.log('CSP Report received');
   }
+  res.setHeader('Cache-Control', 'no-store');
   res.status(204).end();
 });
 

@@ -6,6 +6,43 @@ const heroSubtitle = document.getElementById('heroSubtitle');
 interactionLabel.className = 'interaction-label';
 document.body.appendChild(interactionLabel);
 
+const blockedKeyCombos = [
+  'PrintScreen',
+  'F12',
+  'F9',
+  'F10',
+  'F11',
+  'Meta+Shift+3',
+  'Meta+Shift+4',
+  'Ctrl+Shift+I',
+  'Ctrl+Shift+J',
+  'Ctrl+Shift+C',
+  'Ctrl+Shift+K',
+  'Ctrl+U',
+  'Ctrl+S',
+  'Ctrl+P',
+  'Meta+S',
+  'Meta+P',
+  'Meta+Option+I'
+];
+
+function isCaptureBlockedKey(event) {
+  const modifier = event.ctrlKey ? 'Ctrl' : event.metaKey ? 'Meta' : event.altKey ? 'Alt' : '';
+  const shift = event.shiftKey ? '+Shift' : '';
+  const key = event.key.length === 1 ? event.key.toLowerCase() : event.key;
+
+  if (event.key === 'PrintScreen' || event.key === 'F12') return true;
+  if ((event.ctrlKey || event.metaKey) && ['s', 'c', 'x', 'p', 'u', 'i', 'j'].includes(key.toLowerCase())) return true;
+  if (event.altKey && event.key === 'Tab') return true;
+
+  if (modifier) {
+    const combo = `${modifier}${shift}+${key}`;
+    return blockedKeyCombos.includes(combo) || blockedKeyCombos.includes(`${modifier}${shift}`);
+  }
+
+  return false;
+}
+
 const archiveOverlay = document.getElementById('archiveOverlay');
 const archiveTitle = document.getElementById('archiveTitle');
 const archiveDescription = document.getElementById('archiveDescription');
@@ -18,6 +55,7 @@ const paintingPrev = document.getElementById('paintingPrev');
 const paintingNext = document.getElementById('paintingNext');
 const mainArea = document.querySelector('.main-area');
 const dividerLine = document.querySelector('.divider-line');
+const projectsMenu = document.querySelector('a.menu-item[data-target="projects"]');
 const imageBase = './images/';
 const paintingSlides = [
   {
@@ -41,6 +79,11 @@ const paintingPreloadImages = paintingSlides.map((slide) => {
   img.src = `${imageBase}${slide.image}`;
   return img;
 });
+
+if (projectsMenu) {
+  projectsMenu.addEventListener('mouseenter', () => projectsMenu.classList.add('is-hovered'));
+  projectsMenu.addEventListener('mouseleave', () => projectsMenu.classList.remove('is-hovered'));
+}
 const sectionOrder = ['home', 'archive', 'painting', 'media', 'about', 'projects', 'contact'];
 let currentPaintingIndex = 0;
 let scrollTimeout = null;
@@ -120,7 +163,7 @@ function setHeroSection(target) {
 
   const section = sectionMap[target] || sectionMap.home;
   const showsArtwork = target === 'painting';
-  if (heroTitle) heroTitle.textContent = section.title;
+  setHeroTitle(section.title);
   if (heroSubtitle) heroSubtitle.textContent = section.subtitle;
   if (heroSection) heroSection.classList.toggle('hero--section', target !== 'home');
   if (mainArea) mainArea.classList.toggle('artwork-visible', showsArtwork);
@@ -140,6 +183,21 @@ function setHeroSection(target) {
   if (heroMediaCaption && showsArtwork) {
     heroMediaCaption.textContent = '';
   }
+}
+
+let heroTitleTransitionTimer = null;
+
+function setHeroTitle(title) {
+  if (!heroTitle) return;
+
+  window.clearTimeout(heroTitleTransitionTimer);
+  heroTitle.classList.add('is-changing');
+  heroTitleTransitionTimer = window.setTimeout(() => {
+    heroTitle.textContent = title;
+    window.requestAnimationFrame(() => {
+      heroTitle.classList.remove('is-changing');
+    });
+  }, 150);
 }
 
 function showArchiveContent(title, description) {
@@ -187,6 +245,21 @@ document.querySelectorAll('a.menu-item, .menu-link, .top-nav a').forEach((item) 
       if (safeTarget === 'home' || ['about', 'archive', 'projects', 'contact'].includes(safeTarget)) {
         window.location.hash = safeTarget;
       }
+    }
+  });
+});
+
+document.querySelectorAll('.project-detail-item').forEach((projectItem) => {
+  const selectProject = (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    setHeroTitle(projectItem.dataset.projectTitle || '');
+  };
+
+  projectItem.addEventListener('click', selectProject);
+  projectItem.addEventListener('keydown', (event) => {
+    if (event.key === 'Enter' || event.key === ' ') {
+      selectProject(event);
     }
   });
 });
@@ -282,19 +355,66 @@ if (canvas) {
 }
 
 document.addEventListener('contextmenu', (event) => {
-  if (event.target.closest('.hero-media') || event.target.closest('.painting-left')) {
+  if (event.target.closest('.hero-media') || event.target.closest('.painting-left') || event.target.closest('img') || event.target.closest('canvas')) {
     event.preventDefault();
   }
 });
 
 document.addEventListener('dragstart', (event) => {
-  if (event.target.closest('.painting-left') || event.target.classList.contains('painting-image')) {
+  if (event.target.closest('.painting-left') || event.target.closest('img') || event.target.closest('canvas') || event.target.classList.contains('painting-image')) {
     event.preventDefault();
   }
 });
 
-document.addEventListener('keydown', (event) => {
-  if (event.key === 'PrintScreen' || (event.ctrlKey && ['s', 'c', 'x', 'p'].includes(event.key.toLowerCase())) || (event.metaKey && ['s', 'c', 'x', 'p'].includes(event.key.toLowerCase()))) {
+document.addEventListener('selectstart', (event) => {
+  if (event.target.closest('img, canvas, .painting-left, .hero-media')) {
     event.preventDefault();
   }
 });
+
+document.addEventListener('copy', (event) => {
+  event.preventDefault();
+});
+
+document.addEventListener('cut', (event) => {
+  event.preventDefault();
+});
+
+document.addEventListener('paste', (event) => {
+  event.preventDefault();
+});
+
+document.addEventListener('keydown', (event) => {
+  if (isCaptureBlockedKey(event)) {
+    event.preventDefault();
+    event.stopPropagation();
+    return false;
+  }
+
+  if (event.key === 'F12' || event.key === 'PrintScreen') {
+    event.preventDefault();
+    event.stopPropagation();
+  }
+});
+
+window.addEventListener('blur', () => {
+  document.body.classList.add('capture-focus-lost');
+});
+
+window.addEventListener('focus', () => {
+  document.body.classList.remove('capture-focus-lost');
+});
+
+if (navigator.mediaDevices && 'getDisplayMedia' in navigator.mediaDevices) {
+  const originalGetDisplayMedia = navigator.mediaDevices.getDisplayMedia.bind(navigator.mediaDevices);
+  navigator.mediaDevices.getDisplayMedia = function() {
+    return Promise.reject(new DOMException('Screen capture is disabled on this page.', 'NotAllowedError'));
+  };
+  navigator.mediaDevices.getDisplayMedia = Object.defineProperty(navigator.mediaDevices, 'getDisplayMedia', {
+    configurable: true,
+    writable: true,
+    value: function() {
+      return Promise.reject(new DOMException('Screen capture is disabled on this page.', 'NotAllowedError'));
+    }
+  });
+}
