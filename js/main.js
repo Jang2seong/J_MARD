@@ -53,6 +53,7 @@ const paintingImage = document.getElementById('paintingImage');
 const paintingCaption = document.getElementById('paintingCaption');
 const paintingPrev = document.getElementById('paintingPrev');
 const paintingNext = document.getElementById('paintingNext');
+const fluidWorldVideo = document.getElementById('fluidWorldVideo');
 const mainArea = document.querySelector('.main-area');
 const dividerLine = document.querySelector('.divider-line');
 const projectsMenu = document.querySelector('a.menu-item[data-target="projects"]');
@@ -86,6 +87,7 @@ if (projectsMenu) {
 }
 const sectionOrder = ['home', 'archive', 'painting', 'media', 'about', 'projects', 'contact'];
 let currentPaintingIndex = 0;
+let selectedProjectTitle = '';
 let scrollTimeout = null;
 
 function updatePaintingSlide(index, animate = true) {
@@ -156,21 +158,29 @@ function setHeroSection(target) {
     painting: { title: 'PAINTING', subtitle: '회화' },
     media: { title: 'MEDIA ART', subtitle: '미디어 아트 아카이브' },
     about: { title: 'PROFILE', subtitle: 'Jang seong Lee 1999 08.04' },
-    archive: { title: '작가노트', subtitle: '작품 아카이브' },
+    archive: { title: 'ARTIST STATEMENT', subtitle: '작품 아카이브' },
     projects: { title: 'PROJECTS', subtitle: '프로젝트' },
     contact: { title: 'CONTACT', subtitle: 'mail: ssyaaa3578@naver.com' }
   };
 
   const section = sectionMap[target] || sectionMap.home;
   const showsArtwork = target === 'painting';
+  const showsFluidWorld = target === 'projects' && selectedProjectTitle === 'FLUID WORLD';
   setHeroTitle(section.title);
   if (heroSubtitle) heroSubtitle.textContent = section.subtitle;
   if (heroSection) heroSection.classList.toggle('hero--section', target !== 'home');
-  if (mainArea) mainArea.classList.toggle('artwork-visible', showsArtwork);
+  if (mainArea) {
+    mainArea.classList.toggle('artwork-visible', showsArtwork);
+    mainArea.classList.toggle('fluid-world-visible', showsFluidWorld);
+  }
 
   if (heroMedia) {
-    heroMedia.classList.toggle('show', showsArtwork);
-    heroMedia.setAttribute('aria-hidden', String(!showsArtwork));
+    heroMedia.classList.toggle('show', showsArtwork || showsFluidWorld);
+    heroMedia.classList.toggle('is-fluid-world', showsFluidWorld);
+    heroMedia.setAttribute('aria-hidden', String(!(showsArtwork || showsFluidWorld)));
+  }
+  if (fluidWorldVideo && !showsFluidWorld) {
+    fluidWorldVideo.pause();
   }
 
   const contactCard = document.getElementById('contactCard');
@@ -253,7 +263,10 @@ document.querySelectorAll('.project-detail-item').forEach((projectItem) => {
   const selectProject = (event) => {
     event.preventDefault();
     event.stopPropagation();
-    setHeroTitle(projectItem.dataset.projectTitle || '');
+    const projectTitle = projectItem.dataset.projectTitle || '';
+    selectedProjectTitle = projectTitle;
+    setHeroSection('projects');
+    setHeroTitle(projectTitle);
   };
 
   projectItem.addEventListener('click', selectProject);
@@ -282,7 +295,6 @@ window.addEventListener('hashchange', () => {
 const canvas = document.getElementById('cloudCanvas');
 if (canvas) {
   const ctx = canvas.getContext('2d');
-  let animationFrame = null;
 
   function resizeCanvas() {
     const ratio = window.devicePixelRatio || 1;
@@ -343,15 +355,14 @@ if (canvas) {
     ctx.stroke();
   }
 
-  function animate() {
-    const time = performance.now();
+  function animate(time) {
     drawClouds(time);
-    animationFrame = requestAnimationFrame(animate);
+    requestAnimationFrame(animate);
   }
 
   window.addEventListener('resize', resizeCanvas);
   resizeCanvas();
-  animate();
+  requestAnimationFrame(animate);
 }
 
 document.addEventListener('contextmenu', (event) => {
