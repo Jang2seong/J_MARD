@@ -3,6 +3,9 @@ const interactionLabel = document.createElement('div');
 const heroSection = document.getElementById('heroSection');
 const heroTitle = document.getElementById('heroTitle');
 const heroSubtitle = document.getElementById('heroSubtitle');
+const projectBackgroundVideo = document.getElementById('projectBackgroundVideo');
+let projectVideoBackgroundVisible = false;
+let setCloudMotionPaused = () => {};
 interactionLabel.className = 'interaction-label';
 document.body.appendChild(interactionLabel);
 
@@ -154,7 +157,7 @@ if (dividerLine) {
 
 function setHeroSection(target) {
   const sectionMap = {
-    home: { title: 'J_MARD', subtitle: 'Creative Director' },
+    home: { title: 'J_MARD', subtitle: '' },
     painting: { title: 'PAINTING', subtitle: '회화' },
     media: { title: 'MEDIA ART', subtitle: '미디어 아트 아카이브' },
     about: { title: 'PROFILE', subtitle: 'Jang seong Lee 1999 08.04' },
@@ -163,15 +166,52 @@ function setHeroSection(target) {
     contact: { title: 'CONTACT', subtitle: 'mail: ssyaaa3578@naver.com' }
   };
 
+  document.querySelectorAll('.side-menu .menu-item[data-target]').forEach((item) => {
+    const menuTarget = item.getAttribute('data-target');
+    const isCurrent = menuTarget === target || (
+      menuTarget === 'archive' && ['painting', 'media'].includes(target)
+    );
+    if (isCurrent) {
+      item.setAttribute('aria-current', 'page');
+    } else {
+      item.removeAttribute('aria-current');
+    }
+  });
+  archiveButtons.forEach((button) => {
+    if (button.getAttribute('data-target') === target) {
+      button.setAttribute('aria-current', 'page');
+    } else {
+      button.removeAttribute('aria-current');
+    }
+  });
+
   const section = sectionMap[target] || sectionMap.home;
   const showsArtwork = target === 'painting';
   const showsFluidWorld = target === 'projects' && selectedProjectTitle === 'FLUID WORLD';
+  const showsMutantSea = target === 'projects' && selectedProjectTitle === 'MUTANT SEA';
+  const showsProjectVideoBackground = showsFluidWorld || showsMutantSea;
+  projectVideoBackgroundVisible = showsProjectVideoBackground;
+  setCloudMotionPaused(projectVideoBackgroundVisible);
   setHeroTitle(section.title);
-  if (heroSubtitle) heroSubtitle.textContent = section.subtitle;
+  if (heroSubtitle) setHeroText(heroSubtitle, section.subtitle);
   if (heroSection) heroSection.classList.toggle('hero--section', target !== 'home');
   if (mainArea) {
+    mainArea.classList.toggle('home-visible', target === 'home');
     mainArea.classList.toggle('artwork-visible', showsArtwork);
     mainArea.classList.toggle('fluid-world-visible', showsFluidWorld);
+    mainArea.classList.toggle('project-video-background-visible', showsProjectVideoBackground);
+  }
+  if (projectBackgroundVideo) {
+    if (showsProjectVideoBackground) {
+      const videoSource = showsFluidWorld ? './video/2.mov' : './video/4.mov';
+      if (!projectBackgroundVideo.src.endsWith(videoSource)) {
+        projectBackgroundVideo.src = videoSource;
+        projectBackgroundVideo.load();
+      }
+      projectBackgroundVideo.play().catch((error) => console.error('Unable to play the project background video.', error));
+    } else {
+      projectBackgroundVideo.pause();
+    }
   }
 
   if (heroMedia) {
@@ -190,24 +230,34 @@ function setHeroSection(target) {
     contactCard.setAttribute('aria-hidden', String(!showContact));
   }
 
-  if (heroMediaCaption && showsArtwork) {
-    heroMediaCaption.textContent = '';
+  if (heroMediaCaption) {
+    heroMediaCaption.textContent = showsFluidWorld
+      ? '현실세계의 물리법칙을 변형하여 새로운 질서를 형성한다.'
+      : '';
   }
 }
 
-let heroTitleTransitionTimer = null;
+function setHeroText(element, text) {
+  if (element.getAttribute('aria-label') === text) return;
+
+  const fragment = document.createDocumentFragment();
+
+  Array.from(text).forEach((character, index) => {
+    const span = document.createElement('span');
+    span.className = 'text-char';
+    span.setAttribute('aria-hidden', 'true');
+    span.style.setProperty('--char-index', String(Math.min(index, 24)));
+    span.textContent = character;
+    fragment.appendChild(span);
+  });
+
+  element.setAttribute('aria-label', text);
+  element.replaceChildren(fragment);
+}
 
 function setHeroTitle(title) {
   if (!heroTitle) return;
-
-  window.clearTimeout(heroTitleTransitionTimer);
-  heroTitle.classList.add('is-changing');
-  heroTitleTransitionTimer = window.setTimeout(() => {
-    heroTitle.textContent = title;
-    window.requestAnimationFrame(() => {
-      heroTitle.classList.remove('is-changing');
-    });
-  }, 150);
+  setHeroText(heroTitle, title);
 }
 
 function showArchiveContent(title, description) {
@@ -295,6 +345,8 @@ window.addEventListener('hashchange', () => {
 const canvas = document.getElementById('cloudCanvas');
 if (canvas) {
   const ctx = canvas.getContext('2d');
+  let cloudAnimationFrame = null;
+  let cloudMotionPaused = false;
 
   function resizeCanvas() {
     const ratio = window.devicePixelRatio || 1;
@@ -304,7 +356,7 @@ if (canvas) {
     canvas.width = Math.floor(width * ratio);
     canvas.height = Math.floor(height * ratio);
     ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
-    drawClouds();
+    if (!cloudMotionPaused) drawClouds();
   }
 
   function drawClouds(time = 0) {
@@ -357,12 +409,26 @@ if (canvas) {
 
   function animate(time) {
     drawClouds(time);
-    requestAnimationFrame(animate);
+    cloudAnimationFrame = requestAnimationFrame(animate);
   }
 
+  setCloudMotionPaused = (paused) => {
+    cloudMotionPaused = paused;
+    canvas.style.display = paused ? 'none' : '';
+    if (paused) {
+      if (cloudAnimationFrame !== null) {
+        cancelAnimationFrame(cloudAnimationFrame);
+        cloudAnimationFrame = null;
+      }
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+    } else if (cloudAnimationFrame === null) {
+      cloudAnimationFrame = requestAnimationFrame(animate);
+    }
+  };
+
   window.addEventListener('resize', resizeCanvas);
+  setCloudMotionPaused(projectVideoBackgroundVisible);
   resizeCanvas();
-  requestAnimationFrame(animate);
 }
 
 document.addEventListener('contextmenu', (event) => {
